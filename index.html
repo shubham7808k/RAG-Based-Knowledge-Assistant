@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAG Knowledge Assistant</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #27274f; /* Deep purple background */
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-white flex flex-col items-center justify-start py-10 px-4">
+
+  <!-- Header Section -->
+  <div class="text-center mb-6">
+    <h1 class="text-3xl font-bold flex items-center justify-center gap-3">
+      <span>🤖</span> RAG Knowledge Assistant
+    </h1>
+    <p class="text-slate-300 text-sm mt-1">
+      Upload documents and ask questions about them
+    </p>
+  </div>
+
+  <!-- Knowledge Base Status Badge -->
+  <div class="w-full max-w-2xl bg-[#3f3f6e] border border-indigo-400/20 text-center py-2.5 px-4 rounded-lg shadow-md mb-6 font-medium text-sm">
+    📚 Knowledge Base: 
+    <span class="font-bold">
+      {% if stats and stats.chunks is defined %}
+        {{ stats.chunks }}
+      {% elif stats and stats.total_chunks is defined %}
+        {{ stats.total_chunks }}
+      {% else %}
+        0
+      {% endif %}
+    </span> 
+    chunks stored
+  </div>
+
+  <!-- Flash Messages Alert -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="w-full max-w-2xl mb-6 space-y-2">
+        {% for category, message in messages %}
+          <div class="p-3.5 rounded-xl text-sm font-semibold text-white shadow-md {% if category == 'error' %} bg-rose-500/90 {% else %} bg-emerald-500/90 {% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Upload Document Card -->
+  <div class="w-full max-w-2xl bg-white text-slate-900 rounded-2xl p-6 shadow-xl mb-6">
+    <h2 class="text-xl font-bold text-[#27274f] flex items-center gap-2 mb-4">
+      <span>📄</span> Upload Document
+    </h2>
+
+    <form action="{{ url_for('upload_document') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+      <div class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center bg-slate-50/50">
+        <input 
+          type="file" 
+          name="document" 
+          accept=".pdf,.txt"
+          required
+          class="block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-200 file:text-slate-700 hover:file:bg-slate-300 cursor-pointer"
+        />
+      </div>
+
+      <button 
+        type="submit" 
+        class="w-full bg-[#705ab1] hover:bg-[#5f49a0] text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-colors text-center"
+      >
+        Upload & Process
+      </button>
+    </form>
+  </div>
+
+  <!-- Ask a Question Card -->
+  <div class="w-full max-w-2xl bg-white text-slate-900 rounded-2xl p-6 shadow-xl mb-6">
+    <h2 class="text-xl font-bold text-[#27274f] flex items-center gap-2 mb-4">
+      <span>❓</span> Ask a Question
+    </h2>
+
+    <form action="{{ url_for('ask_question') }}" method="POST" class="space-y-4">
+      <textarea 
+        name="question" 
+        rows="4" 
+        placeholder="What would you like to know?"
+        required
+        class="w-full border border-slate-300 rounded-xl p-3.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-y"
+      ></textarea>
+
+      <button 
+        type="submit" 
+        class="w-full bg-[#29d38c] hover:bg-[#22bd7c] text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-colors text-center"
+      >
+        Get Answer
+      </button>
+    </form>
+  </div>
+
+  <!-- Clear Everything Card -->
+  <div class="w-full max-w-2xl bg-white text-slate-900 rounded-2xl p-6 shadow-xl">
+    <form action="{{ url_for('clear_data') }}" method="POST" onsubmit="return confirm('Are you sure you want to clear all stored knowledge?');">
+      <button 
+        type="submit" 
+        class="w-full bg-[#f9554a] hover:bg-[#e0453b] text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2"
+      >
+        <span>🗑️</span> Clear Everything
+      </button>
+    </form>
+  </div>
+
+</body>
+</html>

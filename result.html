@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Answer - RAG Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 RAG Knowledge Assistant</h1>
+            <a href="/" class="back-link">← Back to Home</a>
+        </div>
+
+        <div class="card">
+            <h2>❓ Your Question</h2>
+            <p class="question-box">{{ question }}</p>
+        </div>
+
+        <div class="card answer-card">
+            <h2>💡 Answer</h2>
+            <div class="answer-box">{{ answer | replace('\n', '<br>') | safe }}</div>
+        </div>
+
+        {% if sources %}
+        <div class="card">
+            <h2>📖 Sources ({{ sources|length }})</h2>
+            {% for source in sources %}
+            <div class="source-item">
+                <span class="badge">Source {{ loop.index }}</span>
+                <p>{{ source.content }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <h2>🔄 Ask Another Question</h2>
+            <form action="/ask" method="POST">
+                <textarea name="question" placeholder="Ask another question..." rows="3" required></textarea>
+                <button type="submit" class="btn btn-ask">Get Answer</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
